@@ -41,7 +41,6 @@ B_mag := 1.0 // define external magnetic field (T)
 tableadd(B_ext)
 tableaddvar(B_mag,"B_mag","T")
 
-
 // --------------------
 tableautosave(1e-11) // timestep of output data points - 1e-11s
 
