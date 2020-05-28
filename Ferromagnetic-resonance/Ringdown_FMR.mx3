@@ -1,0 +1,58 @@
+cellX :=  2e-9 // 1nm
+cellY :=  2e-9
+cellZ :=  2e-9
+setGridSize(64,64,20)
+setCellSize(cellX,cellY,cellZ)
+setPBC(16,16,0) // 16 repeats of the simulation system in x, y direction
+
+//1. Set geometry
+setgeom(layers(0,3)) // layer index starts from 0
+
+//2. Parameters
+Msat = 1400e3 	// saturation magnetisation (A/m), Cobalt [1]
+alpha = 0.01		// Landau-Lifshitz damping constant
+Aex = 30e-12 	// Exchange stiffness (J/m), Cobalt [1]
+
+defregion(0,layer(0) 	// FM1
+defregion(2,layer(2)) 	// FM2
+
+M_sat0 := 1300e3 		// Ms at FM1
+M_sat2 := 1300e3 		// Ms at FM2
+Msat.setregion(0,M_sat0)
+Msat.setregion(2,M_sat2)
+
+Ku1=4.3e5 // 1st order uniaxial anisotropy constant (J/m3), Cobalt [1]
+AnisU = vector(0, 0, 1) // Uniaxial anisotropy direction
+EnableDemag=true
+
+
+//4.
+m=uniform(0,1,1) // define initial magnetisation
+
+// set up in-plane magnetic field
+degree := 30	// angle between B_mag and +x axis, in xOy plane
+				// canting angle is necessary, in order to break the artifical symmetry
+				// of the simulation geometry
+
+radDeg := degree*pi/180 // unitdeg2rad
+
+B_mag := 1.0 // define external magnetic field (T)
+
+tableadd(B_ext)
+tableaddvar(B_mag,"B_mag","T")
+
+
+// --------------------
+tableautosave(1e-11) // timestep of output data points - 1e-11s
+
+for B_mag = 0.1; B_mag<0.71; B_mag += 0.2{
+    B_ext = vector(B_mag * cos(radDeg), B_mag * sin(radDeg), 0)
+    relax()
+    minimize()                    
+    B_ext = vector(B_mag * cos(radDeg + 0.001), B_mag * sin(radDeg + 0.001), 0)
+    run(5e-9) // 5 ns
+}
+
+/*
+[1] V. A. Bautin et al. Magnetic properties of polycrystalline cobalt nanoparticles, AIP Adv. 7, 045103 (2017)
+*/
