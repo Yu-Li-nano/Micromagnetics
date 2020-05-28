@@ -1,0 +1,69 @@
+/*
+To acquire a FMR spectrum with a range of external magnetic field, a ringdown method
+is highly recommended, which saves huge amounts of time.
+However, you could run this code to test the accuracy of the characteristic frequency
+(freq0) from ringdown method. Run this code with excitation frequencies around freq0,
+to check if the amplitude of sinodial oscillation reaches a local maximum.
+*/
+
+cellX :=  2e-9 // 1nm
+cellY :=  2e-9
+cellZ :=  2e-9
+setGridSize(64,64,20)
+setCellSize(cellX,cellY,cellZ)
+setPBC(16,16,0) // 16 repeats of the simulation system in x, y direction
+
+//1. Set geometry
+setgeom(layers(0,3)) // layer index starts from 0
+
+//2. Parameters
+Msat = 1400e3 	// saturation magnetisation (A/m), Cobalt [1]
+alpha = 0.01		// Landau-Lifshitz damping constant
+Aex = 30e-12 	// Exchange stiffness (J/m), Cobalt [1]
+
+defregion(0,layer(0) 	// FM1
+defregion(2,layer(2)) 	// FM2
+
+M_sat0 := 1300e3 		// Ms at FM1
+M_sat2 := 1300e3 		// Ms at FM2
+Msat.setregion(0,M_sat0)
+Msat.setregion(2,M_sat2)
+
+Ku1=4.3e5 // 1st order uniaxial anisotropy constant (J/m3), Cobalt [1]
+AnisU = vector(0, 0, 1) // Uniaxial anisotropy direction
+EnableDemag=true
+
+
+//4.
+m=uniform(0,1,1) // define initial magnetisation
+
+// set up in-plane magnetic field
+degree := 30	// angle between B_mag and +x axis, in xOy plane
+				// canting angle is necessary, in order to break the artifical symmetry
+				// of the simulation geometry
+
+radDeg := degree*pi/180 // unitdeg2rad
+
+B_mag := 1.0 // define external magnetic field (T)
+
+tableadd(B_ext)
+tableaddvar(B_mag,"B_mag","T")
+
+
+// 5.
+tableautosave(1e-12) // timestep of output data points - 1e-12s
+freq_exc0:=20.6e9 // freq of excitation magnetic field B_exc
+for freq_exc:=freq_exc0-0.2e9;freq_exc<freq_exc0+0.3e9;freq_exc+=0.2e9{
+	B_ext = vector(B_mag*cos(radDeg),B_mag*sin(radDeg),0)
+	relax()
+	minimize()
+	B_exc:=0.1e-4 // magnitude of B_exc
+	// B_exc is perpendicular to B_mag
+	B_ext = vector(B_mag*cos(radDeg)-B_exc*sin(radDeg)*sin(2*pi*freq_exc*t),B_mag*sin(radDeg)+B_exc*cos(radDeg)*cos(2*pi*freq_exc*t),0)
+	run(10e-9) // run 10 ns
+	// Tip: only analyse last 10-20 periods. The magnitude of the sinodial oscillation
+	// will vary before in harmonic oscillation stage.
+}
+/*
+[1] V. A. Bautin et al. Magnetic properties of polycrystalline cobalt nanoparticles, AIP Adv. 7, 045103 (2017)
+*/
