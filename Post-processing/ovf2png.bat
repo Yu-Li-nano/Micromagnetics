@@ -5,6 +5,7 @@ if "%1" == "-h" (
 	echo ***Please add the folderpath of 'mumax3-convert.exe' to PATH Environment Variables***
 	echo 1. if you'd like to convert all the '.ovf' to '.png', just type 'ovf2png.bat' in cmd without passing any arguments;
 	echo 2. if you only plan to convert specific file^(s^), pass the keywords as AN argument ^(wildcard is supported^), e.g. type 'ovf2png.bat eg' to convert all the '*eg*.ovf'.
+	echo More details about the 'mumax3-convert' can be found in 'https://godoc.org/github.com/mumax/3/cmd/mumax3-convert', or type 'mumax3-convert -h' in cmd.
 	echo.
 ) else (
 	if "%1" == "" (
