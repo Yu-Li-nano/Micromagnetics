@@ -7,7 +7,7 @@ u = symunit
 mu0 = 4*pi*1e-7 * u.H/u.m; %(H/m), included in symunit since MATLAB R2020a
 
 %% magnetic parameters
-% used FeGe as an example
+% used FeGe as an example [1]
 
 % lattice constant
 a = 4.7                 * u.Ao;             %(angstrom)
@@ -46,3 +46,6 @@ Keff = Ku1-0.5*mu0*Ms^2                     %(m)
 %% which value you'd like to check?
 [len units] = separateUnits(Q)
 len = double(len)
+
+% Ref.
+% [1] M. Beg et al., Sci. Rep. 5, 17137 (2015).
