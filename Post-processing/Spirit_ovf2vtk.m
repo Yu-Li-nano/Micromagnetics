@@ -28,10 +28,10 @@ clear
 close all
 display('loading data')
 % Filenames
-aa3=dir('*.ovf');
+aa3 = dir('*.ovf');
 bbm = {aa3(1:end).name}'
 % Find the data header
-[A,B] = importdata(char(bbm(1)),' ',50);
+[A , B] = importdata(char(bbm(1)),' ',50);
 for ii = 1 : 50
     if length(A.textdata{ii})>=13
         if A.textdata{ii}(1:13) == '# Begin: Data'
@@ -41,73 +41,66 @@ for ii = 1 : 50
 end
 
 % Number of basis cells along principal
-dim=[10 10 10];
+dim = [10 10 10];
 % The basis cell in units of bravais vectors
-bc=[
-    0   0   0
-    0.667609618104668   0.333333333333333   0.467000000000000
-    0.333804809052334   0.666666666666667   0.951000000000000
-    0   0   1.42400000000000
-    0.667609618104668   0.333333333333333   1.89700000000000
-    0   0   5.89700000000000
-    0.667609618104668   0.333333333333333   6.36400000000000
-    0.333804809052334   0.666666666666667   6.84800000000000
-    0   0   7.32100000000000
-    0.667609618104668   0.333333333333333   7.79400000000000
+bc = [
+    0.1135 0.6135	0.8865;
+    -0.3865	0.8865	0.1135;
+    0.8865	0.1135	-0.3865;
     ];
 % Lattice constant (nm)
 lc=0.4671;
 % Bravais vectors
 bv=[
-    0.707 0.0 0.0
-    -0.354 0.612 0.0
-    0.0 0.0 1.0
+    1.0 0.0 0.0;
+    0.0 1.0 0.0;
+    0.0 0.0 1.0;
     ];
 %%
-for ii=1:1 % Number of files
+for ii = 1 : 1 % Number of files
     % Read ovf
     ii
-    [A,B]=importdata(char(bbm(ii)),' ',num_of_header);
-    mydata_m=A.data;
-    nn=1;
-    for zz=1:dim(3)
-        for yy=1:dim(2)
-            for xx=1:dim(1)
+    [A , B] = importdata(char(bbm(ii)),' ',num_of_header);
+    mydata_m = A.data;
+    nn = 1;
+    for zz = 1 : dim(3)
+        for yy = 1 : dim(2)
+            for xx = 1 : dim(1)
                 % pos of cell
-                pos_cell=(xx-1)*bv(1,:)+(yy-1)*bv(2,:)+(zz-1)*bv(3,:);
-                for jj=1:size(bc,1)
+                pos_cell = (xx - 1) * bv(1,:) + (yy - 1) * bv(2,:) + (zz - 1) * bv(3,:);
+                for jj = 1 : size(bc,1)
                     % pos of atom
-                    pos_atom=bc(jj,1)*bv(1,:)+bc(jj,2)*bv(2,:)+bc(jj,3)*bv(3,:);
-                    px(nn)=(pos_cell(1)+pos_atom(1))*lc;
-                    py(nn)=(pos_cell(2)+pos_atom(2))*lc;
-                    pz(nn)=(pos_cell(3)+pos_atom(3))*lc;
-                    mx(nn)=mydata_m(nn,1);
-                    my(nn)=mydata_m(nn,2);
-                    mz(nn)=mydata_m(nn,3);
-                    nn=nn+1;
+                    pos_atom = bc(jj,1) * bv(1,:) + bc(jj,2) * bv(2,:) + bc(jj,3) * bv(3,:);
+                    px(nn) = (pos_cell(1) + pos_atom(1)) * lc;
+                    py(nn) = (pos_cell(2) + pos_atom(2)) * lc;
+                    pz(nn) = (pos_cell(3) + pos_atom(3)) * lc;
+                    mx(nn) = mydata_m(nn,1);
+                    my(nn) = mydata_m(nn,2);
+                    mz(nn) = mydata_m(nn,3);
+                    nn = nn + 1;
                 end
             end
         end
     end
     
-    ppx{ii}=px;
-    ppy{ii}=py;
-    ppz{ii}=pz;
-    pmx{ii}=mx;
-    pmy{ii}=my;
-    pmz{ii}=mz;
+    ppx{ii} = px;
+    ppy{ii} = py;
+    ppz{ii} = pz;
+    pmx{ii} = mx;
+    pmy{ii} = my;
+    pmz{ii} = mz;
     % uncomment the following line if you want to test on the MATLAB
     % quiver3(px,py,pz,mx,my,mz)
     %% ovf2vtk
-    u=mx;
-    v=my;
-    w=mz;
-    filename=[char(bbm(ii)),'.vtk'];
-    x=px;
-    y=py;
-    z=pz;
+    u = mx;
+    v = my;
+    w = mz;
+    filename = [char(bbm(ii)),'.vtk'];
+    x = px;
+    y = py;
+    z = pz;
     
-    nr_of_elements=numel(x);
+    nr_of_elements = numel(x);
     fid = fopen(filename, 'w');
     
     %ASCII file header
